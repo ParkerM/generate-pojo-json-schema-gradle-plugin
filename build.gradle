@@ -1,0 +1,51 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testImplementation 'org.assertj:assertj-core:3.13.2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+gradlePlugin {
+    plugins {
+        generateJsonSchema {
+            id = 'io.github.parkerm.generate-pojo-json-schema'
+            implementationClass = 'io.github.parkerm.GeneratePojoJsonSchemaPlugin'
+        }
+    }
+}
+
+sourceSets {
+    functionalTest {
+        java.srcDir file('src/functionalTest/java')
+        resources.srcDir file('src/functionalTest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+gradlePlugin.testSourceSets(sourceSets.functionalTest)
+configurations.functionalTestImplementation.extendsFrom(configurations.testImplementation)
+
+task functionalTest(type: Test) {
+    description = 'Runs functional integration tests'
+    group = 'verification'
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    useJUnitPlatform()
+}
+
+check {
+    dependsOn functionalTest
+}
