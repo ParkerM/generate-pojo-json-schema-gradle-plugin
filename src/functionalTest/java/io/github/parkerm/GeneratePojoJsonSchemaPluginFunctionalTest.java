@@ -3,23 +3,32 @@
  */
 package io.github.parkerm;
 
+import org.gradle.testkit.runner.BuildResult;
+import org.gradle.testkit.runner.GradleRunner;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.io.FileWriter;
 import java.nio.file.Files;
-import org.gradle.testkit.runner.GradleRunner;
-import org.gradle.testkit.runner.BuildResult;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GeneratePojoJsonSchemaPluginFunctionalTest {
 
+    private static final String testProjectDir = "build/functionalTest";
+    private static File projectDir;
+
+    @BeforeAll
+    static void setUp() {
+         projectDir = new File(testProjectDir);
+    }
+
     @Test
     void canRunTask() throws IOException {
         // Setup the test build
-        File projectDir = new File("build/functionalTest");
         Files.createDirectories(projectDir.toPath());
         writeString(new File(projectDir, "settings.gradle"), "");
         writeString(new File(projectDir, "build.gradle"),
@@ -36,7 +45,7 @@ class GeneratePojoJsonSchemaPluginFunctionalTest {
         BuildResult result = runner.build();
 
         // Verify the result
-        assertThat(result.getOutput()).contains("Hello from plugin 'io.github.parkerm.generate-pojo-json-schema'");
+        assertThat(result.getOutput()).contains("1 actionable task: 1 executed");
     }
 
     private void writeString(File file, String string) throws IOException {
