@@ -2,6 +2,7 @@ package io.github.parkerm;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -68,12 +69,18 @@ public class GeneratePojoJsonSchemaTask extends DefaultTask {
         this.outStream = outStream;
     }
 
-    private static <T> String getJsonSchema(Class<T> clazz) throws IOException {
+    private <T> String getJsonSchema(Class<T> clazz) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonSchemaGenerator jsonSchemaGenerator = new JsonSchemaGenerator(mapper);
 
         JsonNode jsonSchema = jsonSchemaGenerator.generateJsonSchema(clazz);
 
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonSchema);
+        ObjectWriter writer;
+        if (prettyPrint) {
+            writer = mapper.writerWithDefaultPrettyPrinter();
+        } else {
+            writer = mapper.writer();
+        }
+        return writer.writeValueAsString(jsonSchema);
     }
 }
