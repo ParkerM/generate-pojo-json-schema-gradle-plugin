@@ -7,7 +7,10 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.34'
+
     testImplementation 'org.assertj:assertj-core:3.13.2'
+    testImplementation 'org.mockito:mockito-core:3.0.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.1'
