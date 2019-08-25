@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class GeneratePojoJsonSchemaTask extends DefaultTask {
         });
     }
 
+    @Input
     public List<Class<?>> getClasses() {
         return classes;
     }
@@ -45,6 +47,7 @@ public class GeneratePojoJsonSchemaTask extends DefaultTask {
         this.classes = classes;
     }
 
+    @Input
     public boolean isPrettyPrint() {
         return prettyPrint;
     }

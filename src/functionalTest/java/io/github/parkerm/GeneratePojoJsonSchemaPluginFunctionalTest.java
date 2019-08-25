@@ -23,7 +23,7 @@ class GeneratePojoJsonSchemaPluginFunctionalTest {
 
     @BeforeAll
     static void setUp() {
-         projectDir = new File(testProjectDir);
+        projectDir = new File(testProjectDir);
     }
 
     @Test
@@ -31,10 +31,10 @@ class GeneratePojoJsonSchemaPluginFunctionalTest {
         // Setup the test build
         Files.createDirectories(projectDir.toPath());
         writeString(new File(projectDir, "settings.gradle"), "");
-        writeString(new File(projectDir, "build.gradle"),
-            "plugins {" +
-            "  id('io.github.parkerm.generate-pojo-json-schema')" +
-            "}");
+        writeString(new File(projectDir, "build.gradle"), "" +
+                "plugins {" +
+                "  id('io.github.parkerm.generate-pojo-json-schema')" +
+                "}");
 
         // Run the build
         GradleRunner runner = GradleRunner.create();
@@ -46,6 +46,35 @@ class GeneratePojoJsonSchemaPluginFunctionalTest {
 
         // Verify the result
         assertThat(result.getOutput()).contains("1 actionable task: 1 executed");
+    }
+
+    @Test
+    void acceptsClassesInput() throws IOException {
+        String buildScript = "" +
+                "plugins {\n" +
+                "  id('io.github.parkerm.generate-pojo-json-schema')\n" +
+                "}\n" +
+                "generateJsonSchema {\n" +
+                "  classes = [Integer.class, String.class]\n" +
+                "  prettyPrint = false\n" +
+                "}";
+        Files.createDirectories(projectDir.toPath());
+        writeString(new File(projectDir, "settings.gradle"), "");
+        writeString(new File(projectDir, "build.gradle"), buildScript);
+
+        // Run the build
+        GradleRunner runner = GradleRunner.create();
+        runner.forwardOutput();
+        runner.withPluginClasspath();
+        runner.withArguments("generateJsonSchema");
+        runner.withProjectDir(projectDir);
+        BuildResult result = runner.build();
+
+        String expectedIntegerSchema = "{\"$schema\":\"http://json-schema.org/draft-04/schema#\",\"title\":\"Integer\",\"type\":\"integer\"}";
+        String expectedStringSchema = "{\"$schema\":\"http://json-schema.org/draft-04/schema#\",\"title\":\"String\",\"type\":\"string\"}";
+        assertThat(result.getOutput())
+                .contains(expectedIntegerSchema)
+                .contains(expectedStringSchema);
     }
 
     private void writeString(File file, String string) throws IOException {
