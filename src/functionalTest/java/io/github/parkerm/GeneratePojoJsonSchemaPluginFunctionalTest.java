@@ -13,6 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,13 +70,23 @@ class GeneratePojoJsonSchemaPluginFunctionalTest {
         runner.withPluginClasspath();
         runner.withArguments("generateJsonSchema");
         runner.withProjectDir(projectDir);
+
         BuildResult result = runner.build();
+
+        Path path = projectDir.toPath().resolve(Paths.get("build", "schema", "json"));
+        assertThat(path.toFile())
+                .exists()
+                .isDirectoryContaining(file -> file.getName().equals("String.schema.json"))
+                .isDirectoryContaining(file -> file.getName().equals("Integer.schema.json"));
 
         String expectedIntegerSchema = "{\"$schema\":\"http://json-schema.org/draft-04/schema#\",\"title\":\"Integer\",\"type\":\"integer\"}";
         String expectedStringSchema = "{\"$schema\":\"http://json-schema.org/draft-04/schema#\",\"title\":\"String\",\"type\":\"string\"}";
-        assertThat(result.getOutput())
-                .contains(expectedIntegerSchema)
-                .contains(expectedStringSchema);
+        assertThat(path.resolve("Integer.schema.json").toFile())
+                .isFile()
+                .hasContent(expectedIntegerSchema);
+        assertThat(path.resolve("String.schema.json").toFile())
+                .isFile()
+                .hasContent(expectedStringSchema);
     }
 
     private void writeString(File file, String string) throws IOException {

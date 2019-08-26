@@ -1,6 +1,5 @@
 package io.github.parkerm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.parkerm.assertions.JsonStringAssertion;
 import io.github.parkerm.fixtures.NotNullObject;
 import io.github.parkerm.fixtures.PlainObject;
@@ -15,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.PrintStream;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -43,10 +43,12 @@ class GeneratePojoJsonSchemaTaskTest {
                 .isEmpty();
         assertThat(task.isPrettyPrint())
                 .isTrue();
-        assertThat(task.getMapper())
-                .isInstanceOf(ObjectMapper.class);
         assertThat(task.getOutStream())
                 .isEqualTo(System.out);
+        assertThat(task.isRedirectToOutStream())
+                .isFalse();
+        assertThat(task.getGeneratedFileDir().toPath())
+                .isEqualTo(Paths.get("build", "schema", "json"));
     }
 
     @Nested
@@ -57,6 +59,7 @@ class GeneratePojoJsonSchemaTaskTest {
         void setUp() {
             outStream = Mockito.mock(PrintStream.class);
             task.setOutStream(outStream);
+            task.setRedirectToOutStream(true);
         }
 
         @Test
@@ -111,6 +114,7 @@ class GeneratePojoJsonSchemaTaskTest {
             outputCaptor = ArgumentCaptor.forClass(String.class);
             outStream = Mockito.mock(PrintStream.class);
             task.setOutStream(outStream);
+            task.setRedirectToOutStream(true);
         }
 
         @Test
